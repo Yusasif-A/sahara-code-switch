@@ -1,0 +1,34 @@
+# Credentials — .env holds live LiveKit, WhatsApp, OpenAI and MongoDB secrets
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+.vscode/
+.idea/
+*.log
+
+# runtime state
+.pending_alerts.json
+_dataset_upload/
+
+# Benchmark audio. 578MB of it, and it is AfriSwitch - a gated dataset that is
+# not ours to republish. The 16 clips the benchmark actually scored are
+# published with credit at huggingface.co/datasets/yusasif/intron-stt_tts-benchmark,
+# which is where the organisers asked for them. `benchmark.py --fetch-afriswitch`
+# refetches the rest.
+samples/
+
+# Synthesised audio from benchmark runs, and scratch files from probing the
+# TTS endpoints. Reproducible, and 22MB of it.
+tts_output/
+cs_*.wav
+gen_*.wav
+tts_live_*.wav
+yo_test.wav
