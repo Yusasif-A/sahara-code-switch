@@ -71,7 +71,18 @@ the right thing, and the freeze is already in place either way.
 | `caller.py` | Places the outbound call |
 | `app.py` | FastAPI: Meta webhook + fraud trigger + demo views |
 | `demo.py` | Full call flow, no credentials needed |
-| `test_guardrails.py` | 117 tests over the authority boundary, verification and language routing |
+| `telco_agent.py` | The telco care agent — **run this as the second worker** |
+| `telco_api.py` | Simulated network, with the same authority boundary |
+| `telco_data.py` | Dummy subscribers, bundles, recharges and known issues |
+| `telco_prompts.py` | System prompt and opening line for the care line |
+| `stt_providers.py` | Chooses the speech model from `STT_PROVIDER` |
+| `intron_stt.py` | Sahara speech-to-text, streaming, code-switched pairs |
+| `elevenlabs_stt.py` | ElevenLabs Scribe speech-to-text |
+| `intron_tts.py` | Sahara text-to-speech over the generate endpoint |
+| `benchmark.py` | ASR benchmark: WER and CER per language, five models |
+| `tts_benchmark.py` | TTS benchmark: hallucination, transcript loss, segment loss |
+| `push_dataset.py` | Publishes the benchmarked clips to HuggingFace |
+| `test_guardrails.py` | 162 tests over the authority boundary, verification, the credential guard and language routing |
 
 The bank API mirrors the [Open Banking Nigeria](https://openbanking.readme.io/reference/overview)
 resource names (`Get By Phone Number`, `GetStatement`, `Card > Block`,
@@ -98,7 +109,7 @@ you exactly which layer broke.
 
 ```bash
 python demo.py                    # scripted call through the real bank logic
-pytest test_guardrails.py -q      # 117 tests
+pytest test_guardrails.py -q      # 162 tests
 ```
 
 ### Stage 2 — talk to the agent through your laptop, no telephony
