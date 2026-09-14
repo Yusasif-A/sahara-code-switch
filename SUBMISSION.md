@@ -7,7 +7,7 @@ Copy each block into the matching box. Word counts are in brackets.
 ## Solution Title
 
 ```
-Swift Naija — reaching the customer inside the window, in their own language
+Noba — reaching the customer inside the window, in their own language
 ```
 
 ---
@@ -58,28 +58,28 @@ agent.
 
 ---
 
-## 3. How your app solves the user problem [81 words]
+## 3. How your app solves the user problem [80 words]
 
 ```
-Swift Naija is a customer agent for both a bank and a telecom company. On
-fraud it calls the instant a signal fires and freezes the card inside that
-window - prevention, not a post-mortem. It never asks for a PIN or OTP and says
-so. On the care line there is no press one, press two: you say what is wrong
-and it fixes it. It answers on a WhatsApp call or a normal phone call, in any
+Noba is a customer agent for both a bank and a telecom company. On fraud it
+calls the instant a signal fires and freezes the card inside that window -
+prevention, not a post-mortem. It never asks for a PIN or OTP and says so. On
+the care line there is no press one, press two: you say what is wrong and it
+fixes it. It answers on a WhatsApp call or a normal phone call, in any Nigerian
+language.
+```
+
+
+
+
+*Strict-50 fallback, 62 words:*
+
+```
+Noba is a customer agent for both a bank and a telecom company. On fraud it
+calls the instant a signal fires and freezes the card inside that window,
+before the money moves. On the care line there is no press one, press two: you
+say what is wrong and it fixes it. WhatsApp call or normal call, in any
 Nigerian language.
-```
-
-
-
-
-*Strict-50 fallback, 63 words:*
-
-```
-Swift Naija is a customer agent for both a bank and a telecom company. On
-fraud it calls the instant a signal fires and freezes the card inside that
-window, before the money moves. On the care line there is no press one, press
-two: you say what is wrong and it fixes it. WhatsApp call or normal call, in
-any Nigerian language.
 ```
 
 ---
