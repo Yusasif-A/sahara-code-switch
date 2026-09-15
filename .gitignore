@@ -52,3 +52,8 @@ grant_permission.py
 # The competition answers. Working notes for one submission form, not part of
 # the project, and nothing a reader of the code needs.
 SUBMISSION.md
+
+# Speech adapters written while comparing models, kept locally so the work is
+# not lost but out of the repo, because the agent does not run on any of them.
+# Naming them here would be the same as tracking them.
+local/

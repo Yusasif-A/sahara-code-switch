@@ -15,7 +15,14 @@ Provider notes from testing on live WhatsApp calls:
                 audio it returned "-.seint." for "saint mary" and "gain." for
                 "green" — accurate enough on clean wideband, poor on the phone.
   intron        The Sahara API. Streaming WebSocket, not OpenAI-compatible, so
-                it needs the adapter below rather than openai.STT.
+                it needs the adapter below rather than openai.STT. This is what
+                the agent runs on: it is the only model that keeps both halves
+                of a code-switched sentence, which is the whole point here.
+
+The benchmark compares more models than this factory can build - see
+benchmark.py, which calls each provider's HTTP API directly rather than going
+through a LiveKit plugin. Measuring a model and running the agent on it are
+different jobs, and only the second one needs to live here.
 """
 
 from __future__ import annotations
@@ -111,22 +118,6 @@ def build_stt(provider: str | None = None, *, vad=None) -> agents_stt.STT:
             vad=vad,
         )
 
-    if name == "elevenlabs":
-        if not settings.stt.elevenlabs_api_key:
-            raise RuntimeError(
-                "STT_PROVIDER=elevenlabs but ELEVENLABS_API_KEY is not set"
-            )
-        from elevenlabs_stt import ElevenLabsSTT
-
-        logger.info("STT provider: elevenlabs (%s)", settings.stt.elevenlabs_stt_model)
-        return ElevenLabsSTT(
-            api_key=settings.stt.elevenlabs_api_key,
-            model=settings.stt.elevenlabs_stt_model,
-            # Blank means let Scribe detect, which is the right default on
-            # code-switched audio - there is no single correct language to name.
-            language="" if settings.stt.language.lower() in ("auto", "multi") else settings.stt.language,
-        )
-
     if name in ("linguacenter", "openai", "finetuned"):
         # The finetuned-ml endpoints decide the language themselves. Pinning
         # STT_LANGUAGE=en makes them decode a Yoruba utterance as English, which
@@ -150,14 +141,13 @@ def build_stt(provider: str | None = None, *, vad=None) -> agents_stt.STT:
 
     raise RuntimeError(
         f"Unknown STT_PROVIDER '{name}'. "
-        "Use deepgram, intron, elevenlabs, finetuned or linguacenter."
+        "Use intron, deepgram, finetuned or linguacenter."
     )
 
 
 AVAILABLE_PROVIDERS = (
-    "deepgram",
     "intron",
-    "elevenlabs",
+    "deepgram",
     "finetuned",
     "linguacenter",
 )

@@ -122,11 +122,10 @@ the right thing, and the freeze is already in place either way.
 | `telco_prompts.py` | System prompt and opening line for the care line |
 | `stt_providers.py` | Chooses the speech model from `STT_PROVIDER` |
 | `intron_stt.py` | Sahara speech-to-text, streaming, code-switched pairs |
-| `elevenlabs_stt.py` | ElevenLabs Scribe speech-to-text |
 | `intron_tts.py` | Sahara text-to-speech over the generate endpoint |
 | `benchmark.py` | ASR benchmark: WER and CER per language, five models |
 | `tts_benchmark.py` | TTS benchmark: hallucination, transcript loss, segment loss |
-| `test_guardrails.py` | 162 tests over the authority boundary, verification, the credential guard and language routing |
+| `test_guardrails.py` | 181 tests over the authority boundary, verification, the credential guard and language routing |
 
 The bank API mirrors the [Open Banking Nigeria](https://openbanking.readme.io/reference/overview)
 resource names (`Get By Phone Number`, `GetStatement`, `Card > Block`,

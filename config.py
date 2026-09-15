@@ -98,7 +98,7 @@ class STTSettings:
     # Sahara by default, on both halves of the call. It is the only model that
     # keeps both languages of a code-switched sentence, and the point of the
     # project is that a caller does not have to pick one. STT_PROVIDER accepts
-    # elevenlabs, deepgram, finetuned or linguacenter to compare.
+    # deepgram, finetuned or linguacenter to compare.
     provider: str = field(default_factory=lambda: _env("STT_PROVIDER", "intron").lower())
     # STT_BASE_URL wins when set. ENGLISH_STT_API_URL is linguacenter, which is
     # English-only — fine for an English call, useless the moment the caller
@@ -120,10 +120,13 @@ class STTSettings:
     )
 
     intron_api_key: str = field(default_factory=lambda: _env("intron_api"))
+
+    # Benchmark only. The agent does not run on these - benchmark.py calls the
+    # API directly to measure it against Sahara, which is what the challenge
+    # asked for. Scribe is ElevenLabs' speech-to-text model; v1 is multilingual.
     elevenlabs_api_key: str = field(
         default_factory=lambda: _env("ELEVENLABS_API_KEY")
     )
-    # Scribe is ElevenLabs' speech-to-text model; v1 is the multilingual one.
     elevenlabs_stt_model: str = field(
         default_factory=lambda: _env("ELEVENLABS_STT_MODEL", "scribe_v1")
     )

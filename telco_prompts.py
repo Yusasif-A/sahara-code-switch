@@ -26,9 +26,8 @@ import code_switching
 # want. Anything else means guessing, and a caller who wanted the bank should
 # not have to sit through a list of airtime options to find that out.
 OPENING_LINE = (
-    "Hi, I am {agent_name}, your A I customer care assistant. "
-    "I can help you with your phone line, or with your bank account. "
-    "Which one are you calling about today?"
+    "Hi, I am {agent_name}, an A I customer care assistant for telecom or bank. "
+    "What can I help you with today?"
 )
 
 
