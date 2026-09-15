@@ -23,25 +23,13 @@ usually read as "where can I see this". The dataset link is the fallback.)*
 
 ---
 
-## 1. Short description of the problem your app addresses [78 words]
+## 1. Short description of the problem your app addresses [46 words]
 
 ```
-A suspicious transaction goes through on a Nigerian bank card, because nobody
-confirms it with the customer in time. Hours later the money is gone and the
-account gets blocked. Nearly half of Nigeria's 25.85 billion naira fraud losses
-in 2025 were social engineering - the customer was tricked, so there is nothing
-to detect. On the telecom side, airtime vanishes and paid data never arrives,
-and reporting it means press one, press two, and still no fix.
-```
-
-*`~50 words` has a tilde, so 78 should pass. Strict-50 fallback, 59 words:*
-
-```
-A suspicious transaction goes through on a Nigerian bank card, because nobody
-confirms it with the customer in time. Hours later the money is gone and the
-account gets blocked. Nearly half of 2025 fraud losses were social engineering,
-so there is nothing to detect. On the telecom side, paid data never arrives and
-the menu never fixes it.
+A suspicious transaction goes through because nobody confirms it with the
+customer in time. Hours later the money is gone and the account gets blocked.
+On the telecom side, paid data never arrives and the menu never fixes it.
+Neither line understands how Nigerians actually speak.
 ```
 
 ---
@@ -58,28 +46,13 @@ agent.
 
 ---
 
-## 3. How your app solves the user problem [80 words]
+## 3. How your app solves the user problem [54 words]
 
 ```
-Noba is a customer agent for both a bank and a telecom company. On fraud it
-calls the instant a signal fires and freezes the card inside that window -
-prevention, not a post-mortem. It never asks for a PIN or OTP and says so. On
-the care line there is no press one, press two: you say what is wrong and it
-fixes it. It answers on a WhatsApp call or a normal phone call, in any Nigerian
-language.
-```
-
-
-
-
-*Strict-50 fallback, 62 words:*
-
-```
-Noba is a customer agent for both a bank and a telecom company. On fraud it
-calls the instant a signal fires and freezes the card inside that window,
-before the money moves. On the care line there is no press one, press two: you
-say what is wrong and it fixes it. WhatsApp call or normal call, in any
-Nigerian language.
+Noba is an A I customer care agent for a bank and a telecom company. It calls
+the moment a transaction looks wrong, confirms with the customer in mixed
+English and Pidgin, and freezes the card on the call. On the telecom line it
+fixes data and recharge problems directly. No menus, no queue.
 ```
 
 ---
@@ -132,14 +105,13 @@ Yes
 
 ---
 
-## 6. How is the solution agentic? What downstream task does the transcript enable? [58 words]
+## 6. How is the solution agentic? What downstream task does the transcript enable? [50 words]
 
 ```
-The transcript triggers action, not a summary. It drives live calls into bank
-and telco APIs: freeze the card before the next charge clears, lower a limit,
-flag a disputed transaction, restore a paid bundle that never activated, credit
-a stuck recharge. Anything irreversible, including refunds and SIM swap, is
-refused in code and passed to a person.
+The agent listens, decides and acts. When a caller says in mixed English and
+Pidgin that a transaction was not theirs, that code-switched transcript is what
+makes it freeze the card, restore a paid data bundle or credit a stuck
+recharge. Refunds and SIM swap go to a human agent.
 ```
 
 ---
