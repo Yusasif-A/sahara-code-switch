@@ -127,8 +127,8 @@ def build_stt(provider: str | None = None, *, vad=None) -> agents_stt.STT:
             language="" if settings.stt.language.lower() in ("auto", "multi") else settings.stt.language,
         )
 
-    if name in ("linguacenter", "openai", "publicaai"):
-        # The multilingua endpoints decide the language themselves. Pinning
+    if name in ("linguacenter", "openai", "finetuned"):
+        # The finetuned-ml endpoints decide the language themselves. Pinning
         # STT_LANGUAGE=en makes them decode a Yoruba utterance as English, which
         # returns confident nonsense rather than an error — set STT_LANGUAGE to
         # "auto" (or blank) to let the model choose, which is what a
@@ -150,7 +150,7 @@ def build_stt(provider: str | None = None, *, vad=None) -> agents_stt.STT:
 
     raise RuntimeError(
         f"Unknown STT_PROVIDER '{name}'. "
-        "Use deepgram, intron, elevenlabs, publicaai or linguacenter."
+        "Use deepgram, intron, elevenlabs, finetuned or linguacenter."
     )
 
 
@@ -158,6 +158,6 @@ AVAILABLE_PROVIDERS = (
     "deepgram",
     "intron",
     "elevenlabs",
-    "publicaai",
+    "finetuned",
     "linguacenter",
 )

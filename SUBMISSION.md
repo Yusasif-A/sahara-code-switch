@@ -23,25 +23,25 @@ usually read as "where can I see this". The dataset link is the fallback.)*
 
 ---
 
-## 1. Short description of the problem your app addresses [74 words]
+## 1. Short description of the problem your app addresses [78 words]
 
 ```
-A bank flags a stolen card in seconds, then nobody reaches the customer for
-hours. By then the money is gone and the account gets blocked. Social
-engineering was 47 percent of Nigeria's 25.85 billion naira fraud losses in
-2025 - the customer was tricked, so there is nothing to detect. On the network
-side, airtime vanishes and paid data never arrives, and reporting it means
-press one, press two, and still no fix.
+A suspicious transaction goes through on a Nigerian bank card, because nobody
+confirms it with the customer in time. Hours later the money is gone and the
+account gets blocked. Nearly half of Nigeria's 25.85 billion naira fraud losses
+in 2025 were social engineering - the customer was tricked, so there is nothing
+to detect. On the telecom side, airtime vanishes and paid data never arrives,
+and reporting it means press one, press two, and still no fix.
 ```
 
-*`~50 words` has a tilde, so 74 should pass. Strict-50 fallback, both halves kept:*
+*`~50 words` has a tilde, so 78 should pass. Strict-50 fallback, 59 words:*
 
 ```
-A bank flags a stolen card in seconds, then nobody reaches the customer for
-hours - the money is gone and the account gets blocked. Social engineering was
-47 percent of 2025 fraud losses: nothing to detect, only someone to reach.
-Meanwhile airtime vanishes, and reporting it means press one, press two, and
-still no fix.
+A suspicious transaction goes through on a Nigerian bank card, because nobody
+confirms it with the customer in time. Hours later the money is gone and the
+account gets blocked. Nearly half of 2025 fraud losses were social engineering,
+so there is nothing to detect. On the telecom side, paid data never arrives and
+the menu never fixes it.
 ```
 
 ---

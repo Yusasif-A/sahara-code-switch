@@ -152,8 +152,8 @@ dataset.
 
 ## Models benchmarked
 
-ASR: Intron Sahara, ElevenLabs Scribe, Deepgram nova-2-phonecall, PublicaAI.
-TTS: Intron Sahara, ElevenLabs multilingual v2, PublicaAI multilingua.
+ASR: Intron Sahara, ElevenLabs Scribe, Deepgram nova-2-phonecall, our fine-tuned model.
+TTS: Intron Sahara, ElevenLabs multilingual v2, our fine-tuned multilingual model.
 
 Metrics follow Intron's AfriHealth MultiBench: WER and CER, normalised and
 unnormalised, reported per language.

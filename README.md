@@ -1,38 +1,83 @@
-# Noba — Nigerian Voice Agents
+# Noba — Nigerian voice agents that act, not just answer
 
-An outbound voice agent that calls a bank customer the moment a fraud signal is
-raised, verifies them through the bank's approved challenge flow, freezes the
-card, and hands anything irreversible to a human.
+Two voice agents on one stack, for the Sahara CodeSwitch Africa Challenge.
 
-Built on LiveKit Agents over WhatsApp. English only for now — the Hausa, Igbo and
-Yoruba STT/TTS endpoints are already in `.env` for a later pass.
+**The fraud line** calls a bank customer the moment a risk signal fires, verifies
+them without asking for anything secret, and freezes the card — inside the window
+where that still saves the money.
 
-Both the fraud line and the telco care line introduce themselves as
-`Noba`, matching the verified name on the WhatsApp number, so the sender the
-customer sees and the voice they hear are the same brand. The name lives only
-in `config.py` (`AGENT_DISPLAY_NAME`,
-`TELCO_AGENT_NAME`, `BANK_NAME`, `TELCO_NAME`) — rebrand by editing `.env`.
+**The care line** replaces the telco press-one-press-two menu. You say what is
+wrong in your own words and it fixes it: a bundle you paid for that never
+arrived, a recharge that never landed, airtime gone with no explanation.
 
-## The idea
+Both understand **English mixed with Pidgin, Yoruba, Hausa or Igbo inside a
+single sentence**, and answer in the register you used. That is not a feature
+bolted on the side — it is the reason the agents exist.
 
-When a bank spots a stolen card or an account takeover, the window to act is
-minutes. An IVR that makes the customer press 1, then 2, then hold, spends that
-window. This agent calls them, speaks plainly, and does the one protective thing
-it is allowed to do.
+## Why this, and why now
 
-## Where the agent's authority stops
+A Nigerian bank's systems flag a stolen card in seconds. Nobody reaches the
+customer for hours, so the money is gone and the response is to block the whole
+account. Nearly half of Nigeria's ₦25.85bn in 2025 fraud losses was social
+engineering — the customer was tricked, so there is nothing for a detection model
+to catch. Only reaching the person stops it, and only in time.
 
-This is the part that matters. The agent may do only things the bank can undo:
+Speaking the caller's language is what makes that reach real rather than
+theoretical. A customer forced to translate their own emergency before anyone
+will help spends the minutes that mattered.
 
-| Pre-approved (agent) | Human fraud desk only |
+## What makes it more than a chatbot
+
+The transcript is not the product. It drives real calls into a bank and telco
+API — and **the agent's authority is enforced in code, not in the prompt**:
+
+| The agent may | Only a human may |
 | --- | --- |
-| Freeze a card | Reverse or recall money |
-| Lower a card limit | Block or close an account |
+| Freeze a card | Reverse or refund money |
+| Lower a daily limit | Block or close an account |
 | Flag a disputed transaction | Unfreeze anything, raise any limit |
-| Open a fraud case | Change phone, email or address |
+| Restore a paid bundle | SIM swap, change contact details |
+| Credit a stuck recharge | |
 
-That split is enforced in three independent places, so no single failure lets the
-agent do something irreversible:
+A prompt is guidance, and a fraud call is exactly where somebody talks past
+guidance. `bank_api.py` and `telco_api.py` raise `PermissionDenied` regardless of
+what was said. Run `python demo.py` and watch the ⛔ lines.
+
+It also never asks for a **PIN, password, OTP, CVV, card number or BVN** — and
+says so in its first ten seconds. Since vishing works precisely because Nigerians
+are used to "your bank calling" asking to confirm details, every honest call
+teaches the reflex that defeats the next fake one.
+
+## The speech models
+
+Sahara (Intron) runs the live agents in both directions — its code-switched
+language pairs (`yo`, `pcm`, `ha`, `ig`) are the only ones that keep **both
+halves** of a mixed sentence. Five ASR models and three TTS models were
+benchmarked on real code-switched audio; the numbers, per language, are in
+[`Benchmark_Report.docx`](Benchmark_Report.docx).
+
+| ASR (WER, lower is better) | Overall | Best at |
+| --- | --- | --- |
+| ElevenLabs Scribe | 0.49 | most accurate overall |
+| **Sahara / Intron** | 0.53 | **keeps the English inside Yoruba** |
+| Deepgram nova-2 | 0.79 | English only |
+
+The 16 benchmarked clips are published at
+[yusasif/intron-stt_tts-benchmark](https://huggingface.co/datasets/yusasif/intron-stt_tts-benchmark).
+
+## Start here
+
+| | |
+| --- | --- |
+| See the logic with no credentials | `python demo.py` |
+| Talk to it from your laptop | `python agent.py console` |
+| Run the tests | `pytest test_guardrails.py -q` (162) |
+| The competition answers | [`SUBMISSION.md`](SUBMISSION.md) |
+
+## How the boundary is enforced
+
+The split above is enforced in three independent places, so no single failure
+lets the agent do something irreversible:
 
 1. `prompts.py` — the instructions tell it what it may do
 2. `agent.py` — tools refuse to act before verification passes
@@ -92,11 +137,11 @@ change of transport, not of shape.
 
 ## Running it
 
-Everything runs in the **`publica` conda environment** (LiveKit is installed
+Everything runs in the project's conda environment (LiveKit is installed
 there, not in the global Python):
 
 ```bash
-conda activate publica
+conda activate <your-env>
 pip install -r requirements.txt   # only pytest was missing
 ```
 
@@ -134,11 +179,11 @@ Answer as Yusuf — his security answers are `amala`, `green`, `green flower sch
 
 **The default config cannot pass this test, by design.** `STT_PROVIDER=deepgram`
 with `STT_LANGUAGE=en` is the right choice for an English call and cannot hear
-Yoruba at all, and the default PrepAI voice is English-only. Both have to move:
+Yoruba at all, and the default the fine-tuned English voice voice is English-only. Both have to move:
 
 ```dotenv
-STT_PROVIDER = publicaai
-STT_BASE_URL = https://stts-yoruba.publicaai.com/yo/v1
+STT_PROVIDER = finetuned
+STT_BASE_URL = https://stts-yoruba.finetuned.com/yo/v1
 STT_LANGUAGE = auto
 ```
 
@@ -150,7 +195,7 @@ than an error.
 
 Output routing needs nothing — `TTS_ROUTING` is on by default. Each sentence the
 agent produces is language-detected and sent to that language's voice
-(`multilingua-tts/yo/`, `/ha/`, `/ig/`), because those endpoints are per-language
+(`finetuned-ml-tts/yo/`, `/ha/`, `/ig/`), because those endpoints are per-language
 and the English model reading Yoruba text produces noise rather than an accent.
 The log line `Speaking in yo: ...` tells you a route fired.
 

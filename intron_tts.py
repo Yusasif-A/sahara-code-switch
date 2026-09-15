@@ -31,7 +31,7 @@ imposes: no 10-100 character chunking, so "Done." works as-is, and no polling
 for audio that has to be explicitly fetched.
 
 The cost is latency: ~5.0s to generate plus ~0.7s to fetch the file, against
-PrepAI's 4.1s and the streaming endpoint's 3.3s warm. Constant regardless of
+the fine-tuned English voice's 4.1s and the streaming endpoint's 3.3s warm. Constant regardless of
 length, which points at a fixed queue rather than per-character work. A second
 and a half per reply is the price of Sahara speaking throughout the call
 instead of intermittently.
@@ -81,6 +81,23 @@ def pcm_from_wav(data: bytes) -> tuple[bytes, int]:
         return data, SAMPLE_RATE
     with wave.open(io.BytesIO(data)) as handle:
         return handle.readframes(handle.getnframes()), handle.getframerate()
+
+
+# Below this length, a trailing full stop is read out as the words "full stop".
+# Measured: "Done." came back as "Done. Full stop", while "Done" and "Done. The
+# card is frozen." were both clean. Sahara's text normaliser appears to treat a
+# final period with almost nothing in front of it as a token to pronounce rather
+# than as punctuation. The agent says short sentences constantly - "Done.",
+# "Okay." - so the caller heard it often.
+SHORT_TEXT_CHARS = 20
+
+
+def _spoken_text(raw: str) -> str:
+    """Trim the trailing full stop off a short line, which would be read aloud."""
+    text = raw.strip()
+    if len(text) <= SHORT_TEXT_CHARS and text.endswith("."):
+        return text[:-1].rstrip()
+    return text
 
 
 class IntronTTS(tts.TTS):
@@ -141,7 +158,7 @@ class IntronTTS(tts.TTS):
 class _IntronStream(tts.ChunkedStream):
     async def _run(self) -> None:
         engine: IntronTTS = self._tts  # type: ignore[assignment]
-        text = self._input_text.strip()
+        text = _spoken_text(self._input_text)
         if not text:
             return
 

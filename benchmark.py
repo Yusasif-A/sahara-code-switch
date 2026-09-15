@@ -408,7 +408,7 @@ def transcribe_elevenlabs(audio: bytes, language: str = "en") -> str:
         return json.load(resp).get("text", "")
 
 
-# PublicaAI's multilingual STT. The host is named stts-yoruba for historical
+# our fine-tuned model's multilingual STT. The host is named stts-yoruba for historical
 # reasons — it serves every language, selected by the path segment:
 #
 #     /en/v1   English        /ha/v1   Hausa
@@ -416,11 +416,11 @@ def transcribe_elevenlabs(audio: bytes, language: str = "en") -> str:
 #
 # Igbo deliberately has no segment, which is why IGBO_STT_API_URL in .env ends
 # at /v1 and is correct as written rather than missing something.
-PUBLICAAI_STT_HOST = "https://stts-yoruba.publicaai.com"
+FINETUNED_STT_HOST = "https://stts-yoruba.finetuned.com"
 
 # Nigerian Pidgin has no endpoint of its own; English is the closest model,
 # Pidgin being English-lexified, rather than an arbitrary pick.
-PUBLICAAI_LANGUAGE_PATH = {
+FINETUNED_LANGUAGE_PATH = {
     "en": "/en",
     "ha": "/ha",
     "yo": "/yo",
@@ -429,15 +429,15 @@ PUBLICAAI_LANGUAGE_PATH = {
 }
 
 
-def transcribe_publicaai(audio: bytes, language: str = "en") -> str:
-    """PublicaAI multilingual STT, routed to the endpoint for the clip's language."""
+def transcribe_finetuned(audio: bytes, language: str = "en") -> str:
+    """our fine-tuned multilingual modell STT, routed to the endpoint for the clip's language."""
     import os
 
-    host = (os.getenv("PUBLICAAI_STT_HOST") or PUBLICAAI_STT_HOST).strip().strip(chr(34))
-    segment = PUBLICAAI_LANGUAGE_PATH.get(language, "/en")
+    host = (os.getenv("FINETUNED_STT_HOST") or FINETUNED_STT_HOST).strip().strip(chr(34))
+    segment = FINETUNED_LANGUAGE_PATH.get(language, "/en")
     base = host.rstrip("/") + segment + "/v1"
 
-    boundary = "----publicaaiboundary"
+    boundary = "----finetunedboundary"
     dash = "--"
     quote = chr(34)
 
@@ -477,7 +477,7 @@ TRANSCRIBERS = {
     "linguacenter": transcribe_linguacenter,
     "intron": transcribe_intron,
     "elevenlabs": transcribe_elevenlabs,
-    "publicaai": transcribe_publicaai,
+    "finetuned": transcribe_finetuned,
 }
 
 # Intron is the only provider here that accepts a code-switched language code,
@@ -819,7 +819,7 @@ def run(
             language = language_for(name)
             started = time.monotonic()
             try:
-                if provider in ("intron", "elevenlabs", "publicaai"):
+                if provider in ("intron", "elevenlabs", "finetuned"):
                     hypothesis = transcriber(audio, language)
                 else:
                     hypothesis = transcriber(audio)
@@ -989,7 +989,7 @@ def main() -> None:
         # intron is opt-in for the same reason as in tts_benchmark.py: it
         # rate-limits and warms a model per language, so it belongs in its
         # own run rather than holding up the fast providers.
-        default="deepgram,elevenlabs,publicaai",
+        default="deepgram,elevenlabs,finetuned",
         help="comma separated: deepgram,intron,linguacenter,elevenlabs",
     )
     parser.add_argument("--report", help="write full results to this JSON file")

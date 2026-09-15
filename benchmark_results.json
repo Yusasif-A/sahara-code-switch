@@ -3,7 +3,7 @@
   "providers": [
     "deepgram",
     "elevenlabs",
-    "publicaai",
+    "finetuned",
     "linguacenter"
   ],
   "sampleCount": 16,
@@ -553,7 +553,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_hausa_000",
       "audioFile": "samples/afriswitch_hausa_000.wav",
       "transcriptFile": "samples/afriswitch_hausa_000.txt",
@@ -570,7 +570,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_hausa_001",
       "audioFile": "samples/afriswitch_hausa_001.wav",
       "transcriptFile": "samples/afriswitch_hausa_001.txt",
@@ -587,7 +587,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_hausa_002",
       "audioFile": "samples/afriswitch_hausa_002.wav",
       "transcriptFile": "samples/afriswitch_hausa_002.txt",
@@ -604,7 +604,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_hausa_003",
       "audioFile": "samples/afriswitch_hausa_003.wav",
       "transcriptFile": "samples/afriswitch_hausa_003.txt",
@@ -621,7 +621,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_igbo_000",
       "audioFile": "samples/afriswitch_igbo_000.wav",
       "transcriptFile": "samples/afriswitch_igbo_000.txt",
@@ -638,7 +638,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_igbo_001",
       "audioFile": "samples/afriswitch_igbo_001.wav",
       "transcriptFile": "samples/afriswitch_igbo_001.txt",
@@ -655,7 +655,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_igbo_002",
       "audioFile": "samples/afriswitch_igbo_002.wav",
       "transcriptFile": "samples/afriswitch_igbo_002.txt",
@@ -672,7 +672,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_igbo_003",
       "audioFile": "samples/afriswitch_igbo_003.wav",
       "transcriptFile": "samples/afriswitch_igbo_003.txt",
@@ -689,7 +689,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_pidgin_000",
       "audioFile": "samples/afriswitch_pidgin_000.wav",
       "transcriptFile": "samples/afriswitch_pidgin_000.txt",
@@ -706,7 +706,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_pidgin_001",
       "audioFile": "samples/afriswitch_pidgin_001.wav",
       "transcriptFile": "samples/afriswitch_pidgin_001.txt",
@@ -723,7 +723,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_pidgin_002",
       "audioFile": "samples/afriswitch_pidgin_002.wav",
       "transcriptFile": "samples/afriswitch_pidgin_002.txt",
@@ -740,7 +740,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_pidgin_003",
       "audioFile": "samples/afriswitch_pidgin_003.wav",
       "transcriptFile": "samples/afriswitch_pidgin_003.txt",
@@ -757,7 +757,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_yoruba_000",
       "audioFile": "samples/afriswitch_yoruba_000.wav",
       "transcriptFile": "samples/afriswitch_yoruba_000.txt",
@@ -774,7 +774,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_yoruba_001",
       "audioFile": "samples/afriswitch_yoruba_001.wav",
       "transcriptFile": "samples/afriswitch_yoruba_001.txt",
@@ -791,7 +791,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_yoruba_002",
       "audioFile": "samples/afriswitch_yoruba_002.wav",
       "transcriptFile": "samples/afriswitch_yoruba_002.txt",
@@ -808,7 +808,7 @@
       "error": null
     },
     {
-      "provider": "publicaai",
+      "provider": "finetuned",
       "sample": "afriswitch_yoruba_003",
       "audioFile": "samples/afriswitch_yoruba_003.wav",
       "transcriptFile": "samples/afriswitch_yoruba_003.txt",

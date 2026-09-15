@@ -54,11 +54,11 @@ class WhatsAppSettings:
 
 @dataclass
 class LLMSettings:
-    # Read LLM first, then PUBLICAAI_BASE_URL. The llama3-8b host is the one that
+    # Read LLM first, then FINETUNED_BASE_URL. The llama3-8b host is the one that
     # works; note it still advertises its model id as google/gemma-4-E4B-it, so
     # the host changes but MODEL does not.
     base_url: str = field(
-        default_factory=lambda: _env("LLM") or _env("PUBLICAAI_BASE_URL")
+        default_factory=lambda: _env("LLM") or _env("FINETUNED_BASE_URL")
     )
     model: str = field(default_factory=lambda: _env("MODEL", "google/gemma-4-E4B-it"))
     api_key: str = field(default_factory=lambda: _env("API_KEY"))
@@ -98,7 +98,7 @@ class STTSettings:
     provider: str = field(default_factory=lambda: _env("STT_PROVIDER", "deepgram").lower())
     # STT_BASE_URL wins when set. ENGLISH_STT_API_URL is linguacenter, which is
     # English-only — fine for an English call, useless the moment the caller
-    # switches. Point STT_BASE_URL at the multilingua endpoint to test that.
+    # switches. Point STT_BASE_URL at the finetuned-ml endpoint to test that.
     base_url: str = field(
         default_factory=lambda: _with_v1(
             _env("STT_BASE_URL") or _env("ENGLISH_STT_API_URL")
@@ -136,7 +136,7 @@ class STTSettings:
 
 def tts_provider() -> str:
     """
-    Which engine speaks: intron (Sahara), prepai, or multilingua.
+    Which engine speaks: intron (Sahara), finetuned-en, or finetuned-ml.
 
     Sahara by default. It is the only one of the three that reads a
     code-switched sentence in one voice - given "Abeg, no be me do that
@@ -148,72 +148,72 @@ def tts_provider() -> str:
     testing and hung up on the fourth. Whole replies are batched into a single
     session to spend as few as possible (see tts_router._speak_batched), and a
     closed socket is retried once, but a long call may still lose a line.
-    TTS_PROVIDER=prepai is the fallback if that happens on the day.
+    TTS_PROVIDER=finetuned-en is the fallback if that happens on the day.
     """
     return _env("TTS_PROVIDER", "intron").lower()
 
 
-def _tts_is_prepai() -> bool:
+def _tts_is_finetuned_en() -> bool:
     """
-    PrepAI carries English. Set TTS_PROVIDER=multilingua to switch it back.
+    the fine-tuned English voice carries English. Set TTS_PROVIDER=finetuned-ml to switch it back.
 
-    Non-English sentences ignore this and go to their own multilingua endpoint
-    either way - PrepAI has no Yoruba, Hausa or Igbo voice - so this only
+    Non-English sentences ignore this and go to their own finetuned-ml endpoint
+    either way - the fine-tuned English voice has no Yoruba, Hausa or Igbo voice - so this only
     decides who speaks English and Pidgin.
     """
-    return tts_provider() not in ("multilingua", "intron", "sahara")
+    return tts_provider() not in ("finetuned-ml", "intron", "sahara")
 
 
 @dataclass
 class TTSSettings:
     """
-    Voice output. Defaults to the multilingua endpoint; TTS_PROVIDER=prepai
-    switches English back to PrepAI.
+    Voice output. Defaults to the finetuned-ml endpoint; TTS_PROVIDER=finetuned-en
+    switches English back to the fine-tuned English voice.
 
     Measured on the same sentences, three runs each:
 
                      short (9 words)   long (44 words)   first byte (long)
-        prepai            2.45s             4.95s             4.12s
-        multilingua       2.28s             4.19s             3.62s
+        finetuned-en            2.45s             4.95s             4.12s
+        finetuned-ml       2.28s             4.19s             3.62s
         intron           (not measured)    10.03s             8.20s
 
-    Three reasons multilingua is the default:
+    Three reasons finetuned-ml is the default:
 
       1. It is faster everywhere, and neither engine streams — first byte lands
          at 85-90% of total time, so the caller waits out the whole sentence.
-      2. PrepAI takes 5.2s to say what multilingua says in 3.8s. That padding
+      2. the fine-tuned English voice takes 5.2s to say what finetuned-ml says in 3.8s. That padding
          is dead air on a fraud call where a card is live.
       3. It is the same model family as the Yoruba, Hausa and Igbo endpoints,
          so the voice does not visibly change speaker when the agent switches
-         language mid-call. With PrepAI on English the jump is obvious and
+         language mid-call. With the fine-tuned English voice on English the jump is obvious and
          sounds like the call was handed to a different person.
 
     Intron TTS is benchmarked but not used live: 8.2s to first audio warm,
     12.5s cold. It is accurate, and far too slow to hold a conversation.
 
-    One landmine: multilingua returns HTTP 500 for response_format=pcm. It must
+    One landmine: finetuned-ml returns HTTP 500 for response_format=pcm. It must
     be wav, which is what the agents send.
     """
 
     base_url: str = field(
         default_factory=lambda: (
-            (_env("PUBLICAAI_TTS_BASE_URL") or _env("ENGLISH_TTS_BASE_URL"))
-            if _tts_is_prepai()
+            (_env("FINETUNED_TTS_BASE_URL") or _env("ENGLISH_TTS_BASE_URL"))
+            if _tts_is_finetuned_en()
             else _env("ENGLISH_TTS_BASE_URL")
         )
     )
     api_key: str = field(default_factory=lambda: _env("API_KEY"))
     model: str = field(
         default_factory=lambda: (
-            _env("PREPAI_TTS_MODEL", "tts-1")
-            if _tts_is_prepai()
+            _env("FINETUNED_EN_TTS_MODEL", "tts-1")
+            if _tts_is_finetuned_en()
             else _env("ENGLISH_TTS_MODEL", "nigerian-english-xtts")
         )
     )
     voice: str = field(
         default_factory=lambda: (
-            _env("PREPAI_TTS_VOICE", "voice5")
-            if _tts_is_prepai()
+            _env("FINETUNED_EN_TTS_VOICE", "voice5")
+            if _tts_is_finetuned_en()
             else _env("ENGLISH_TTS_VOICE", "female2")
         )
     )
@@ -235,7 +235,7 @@ class TTSSettings:
     )
 
     # Route each spoken sentence to the voice for its language. On by default:
-    # the multilingua endpoints are per-language (/en/, /yo/, /ha/, /ig/), so
+    # the finetuned-ml endpoints are per-language (/en/, /yo/, /ha/, /ig/), so
     # without this a Yoruba reply is read by the English model and comes out as
     # gibberish. Set TTS_ROUTING=off to pin everything to one voice.
     routing: bool = field(
@@ -262,7 +262,7 @@ class TTSSettings:
 
     @property
     def is_intron(self) -> bool:
-        """Sahara TTS speaks, rather than one of the PublicaAI endpoints."""
+        """Sahara TTS speaks, rather than one of the our fine-tuned model endpoints."""
         return tts_provider() in ("intron", "sahara")
 
     def endpoint_for(self, lang: str) -> tuple[str, str, str] | None:
@@ -270,7 +270,7 @@ class TTSSettings:
         (base_url, model, voice) for a language code, or None if unconfigured.
 
         English deliberately returns whatever TTS_PROVIDER selected rather than
-        forcing the multilingua English endpoint — PrepAI sounds better on
+        forcing the finetuned-ml English endpoint — the fine-tuned English voice sounds better on
         English, and there is no reason to lose that just because the call may
         also contain Yoruba.
         """
@@ -287,7 +287,7 @@ class TTSSettings:
         # when the agent code-switches. The point of this product is that
         # switching language mid-sentence is ordinary; if the voice changes with
         # it, the call sounds like it was handed to a different person, which
-        # makes the ordinary thing sound like an event. All four multilingua
+        # makes the ordinary thing sound like an event. All four finetuned-ml
         # endpoints accept the English voice name and render it distinctly.
         # Set TTS_PER_LANGUAGE_VOICES=on to go back to each endpoint's own.
         per_language = _env("TTS_PER_LANGUAGE_VOICES", "off").lower() in (
@@ -421,7 +421,7 @@ class Settings:
             ("WHATSAPP_TOKEN", self.whatsapp.token),
             ("WHATSAPP_PHONE_NUMBER_ID", self.whatsapp.phone_number_id),
             ("WHATSAPP_VERIFY_TOKEN", self.whatsapp.verify_token),
-            ("LLM (or PUBLICAAI_BASE_URL)", self.llm.base_url),
+            ("LLM (or FINETUNED_BASE_URL)", self.llm.base_url),
             ("API_KEY", self.llm.api_key),
             ("ENGLISH_TTS_BASE_URL", self.tts.base_url),
         ]

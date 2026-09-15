@@ -32,3 +32,9 @@ cs_*.wav
 gen_*.wav
 tts_live_*.wav
 yo_test.wav
+
+# Demo video and the narration audio. Hundreds of megabytes, and GitHub refuses
+# single files over 100MB anyway - the finished video belongs on YouTube, which
+# is where the submission form asks for it.
+*.mp4
+*.wav

@@ -3,7 +3,7 @@
   "method": "round-trip: TTS -> fixed ASR -> compare to input text",
   "results": [
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_hausa_000",
       "language": "ha",
       "sourceTranscript": "samples/afriswitch_hausa_000.txt",
@@ -11,7 +11,7 @@
       "synthesisedAudio": "tts_output/multilingua_afriswitch_hausa_000.wav",
       "dataset": "AfriSwitch",
       "reference": "Indai wannan ne i will be in church this sunday, i will be in church this sunday, what is your advise. Yauwa your excellency ai kamar yadda honorable din kunkuri ya fada",
-      "transcript": "In dai wannan ne I will be in church this Sunday, I will be in church this Sunday. What is your advice? Yawa Your Excellency ayi kamar yadda Honourable Dunkunkuri ya fa\u0257a.",
+      "transcript": "In dai wannan ne I will be in church this Sunday, I will be in church this Sunday. What is your advice? Yawa Your Excellency ayi kamar yadda Honourable Dunkunkuri ya faɗa.",
       "wer": 0.2812,
       "accuracy": 0.7188,
       "hallucination": 0.25,
@@ -22,7 +22,7 @@
       "error": null
     },
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_hausa_001",
       "language": "ha",
       "sourceTranscript": "samples/afriswitch_hausa_001.txt",
@@ -30,7 +30,7 @@
       "synthesisedAudio": "tts_output/multilingua_afriswitch_hausa_001.wav",
       "dataset": "AfriSwitch",
       "reference": "Yara suna talla se kika turo mun sako a instagram kina cewa da nayi fostin wannan hoton abun ya so sa miki zuciya sosai saboda kin tuna yadda kika taso har ma kin yi hawaye da kika ga wannan hoton. Toh da farko zamu so ki gaya mana, bamu labarin lokacin da kika yi talla Na taso a gidan mu, maman mu yar kasuwa ce, tana siyarda goro, duk older siblings dina",
-      "transcript": "Yara suna tallashe kikat rominsa\u0199o a Instagram, kina cewa da nayi post wannan hoton abun ya sosa miki zuciya sosai saboda kin tuna yadda kika taso har ma kinyi hawaye da kika ga wannan hoton. To da farko zamu so ki gaya mana, bamu labari lokacin da kika yi talla na tasu a gidan mu. Mamanmu yar kasuwa ce tana siyar da goro, duk older siblings dina",
+      "transcript": "Yara suna tallashe kikat rominsaƙo a Instagram, kina cewa da nayi post wannan hoton abun ya sosa miki zuciya sosai saboda kin tuna yadda kika taso har ma kinyi hawaye da kika ga wannan hoton. To da farko zamu so ki gaya mana, bamu labari lokacin da kika yi talla na tasu a gidan mu. Mamanmu yar kasuwa ce tana siyar da goro, duk older siblings dina",
       "wer": 0.25,
       "accuracy": 0.75,
       "hallucination": 0.1667,
@@ -41,7 +41,7 @@
       "error": null
     },
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_igbo_000",
       "language": "ig",
       "sourceTranscript": "samples/afriswitch_igbo_000.txt",
@@ -60,15 +60,15 @@
       "error": null
     },
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_igbo_001",
       "language": "ig",
       "sourceTranscript": "samples/afriswitch_igbo_001.txt",
       "sourceAudio": "samples/afriswitch_igbo_001.wav",
       "synthesisedAudio": "tts_output/multilingua_afriswitch_igbo_001.wav",
       "dataset": "AfriSwitch",
-      "reference": "Pastor g\u1ecb kpechaa kpechaa, you remain a fool. That's why",
-      "transcript": "Na-akpaso g\u1ecb kpechaa. You remain a fool. That's why",
+      "reference": "Pastor gị kpechaa kpechaa, you remain a fool. That's why",
+      "transcript": "Na-akpaso gị kpechaa. You remain a fool. That's why",
       "wer": 0.2727,
       "accuracy": 0.7273,
       "hallucination": 0.1818,
@@ -79,7 +79,7 @@
       "error": null
     },
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_pidgin_000",
       "language": "pcm",
       "sourceTranscript": "samples/afriswitch_pidgin_000.txt",
@@ -98,7 +98,7 @@
       "error": null
     },
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_pidgin_001",
       "language": "pcm",
       "sourceTranscript": "samples/afriswitch_pidgin_001.txt",
@@ -117,7 +117,7 @@
       "error": null
     },
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_yoruba_000",
       "language": "yo",
       "sourceTranscript": "samples/afriswitch_yoruba_000.txt",
@@ -125,7 +125,7 @@
       "synthesisedAudio": "tts_output/multilingua_afriswitch_yoruba_000.wav",
       "dataset": "AfriSwitch",
       "reference": "E ni toripe obinrin kan se nkan to dun yin abi to se nkan ti o da fun yin, ka ro pe gbogbo obinrin ni o da o you need to base your",
-      "transcript": "\u1eb8 n\u00ed tor\u00ed p\u00e9 ob\u00ecnrin kan \u1e63e \u01f9kan t\u00f3 d\u00fany\u00e0 b\u00ed t\u00f3 \u1e63e \u01f9kan t\u00ed \u00f3 d\u00e1 f\u00fan y\u00ec\u00ed, k\u00e1 r\u00f3 p\u00e9 gbogbo ob\u00ecnrin ni \u00f3 d\u00e1. Oyu n\u00ed t\u00f2 b\u00e1 \u1e63e",
+      "transcript": "Ẹ ní torí pé obìnrin kan ṣe ǹkan tó dúnyà bí tó ṣe ǹkan tí ó dá fún yìí, ká ró pé gbogbo obìnrin ni ó dá. Oyu ní tò bá ṣe",
       "wer": 0.9394,
       "accuracy": 0.0606,
       "hallucination": 0.8788,
@@ -136,7 +136,7 @@
       "error": null
     },
     {
-      "provider": "multilingua",
+      "provider": "finetuned-ml",
       "phrase": "afriswitch_yoruba_001",
       "language": "yo",
       "sourceTranscript": "samples/afriswitch_yoruba_001.txt",
@@ -144,7 +144,7 @@
       "synthesisedAudio": "tts_output/multilingua_afriswitch_yoruba_001.wav",
       "dataset": "AfriSwitch",
       "reference": "Iwo ni problem mi, nibo loti jawa lai lokun lorun Iwo ni guts lati wonu Ile mi wa",
-      "transcript": "\u00ccwo ni problem mi. Nib\u00f3 l\u00f3 ti j\u00e1w\u00e1 l\u00e1\u00ecl\u00f2kun l\u00f3r\u00ed \u00ecw\u00f2 n\u00ed Goods l\u00e1ti w\u1ecdn\u00fa il\u00e9 mi w\u00e1?",
+      "transcript": "Ìwo ni problem mi. Nibó ló ti jáwá láìlòkun lórí ìwò ní Goods láti wọnú ilé mi wá?",
       "wer": 0.7778,
       "accuracy": 0.2222,
       "hallucination": 0.7778,
@@ -219,7 +219,7 @@
       "sourceAudio": "samples/afriswitch_igbo_001.wav",
       "synthesisedAudio": "tts_output/elevenlabs_afriswitch_igbo_001.wav",
       "dataset": "AfriSwitch",
-      "reference": "Pastor g\u1ecb kpechaa kpechaa, you remain a fool. That's why",
+      "reference": "Pastor gị kpechaa kpechaa, you remain a fool. That's why",
       "transcript": "Pastor Gikepecha, Gikepecha, you remain a fool. That's why",
       "wer": 0.2727,
       "accuracy": 0.7273,

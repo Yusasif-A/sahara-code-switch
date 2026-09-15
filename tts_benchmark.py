@@ -31,7 +31,7 @@ THE METRICS
 
 Usage:
     python tts_benchmark.py                       # all providers
-    python tts_benchmark.py --providers intron,prepai
+    python tts_benchmark.py --providers intron,finetuned-en
     python tts_benchmark.py --report tts.json --keep-audio
 """
 
@@ -158,7 +158,7 @@ def _openai_tts(base_url: str, model: str, voice: str, api_key: str, text: str) 
         return resp.read()
 
 
-def synth_prepai(text: str, language: str = "en") -> bytes:
+def synth_finetuned_en(text: str, language: str = "en") -> bytes:
     return _openai_tts(
         settings.tts.base_url,
         settings.tts.model,
@@ -169,7 +169,7 @@ def synth_prepai(text: str, language: str = "en") -> bytes:
 
 
 def synth_multilingua(text: str, language: str = "en") -> bytes:
-    """The per-language multilingua endpoints already configured in .env."""
+    """The per-language finetuned-ml endpoints already configured in .env."""
     import os
 
     hosts = {
@@ -180,7 +180,7 @@ def synth_multilingua(text: str, language: str = "en") -> bytes:
     }
     base, model, voice = hosts.get(language) or hosts["en"]
     if not base:
-        raise RuntimeError(f"No multilingua TTS endpoint configured for '{language}'")
+        raise RuntimeError(f"No finetuned-ml TTS endpoint configured for '{language}'")
     return _openai_tts(
         base.strip().strip('"'),
         (model or "tts-1").strip().strip('"'),
@@ -321,7 +321,7 @@ def synth_intron(text: str, language: str = "en") -> bytes:
     raise RuntimeError(f"intron TTS failed after 4 attempts: {last}")
 
 
-# ElevenLabs multilingual TTS. Unlike prepai (English only) and multilingua
+# ElevenLabs multilingual TTS. Unlike finetuned-en (English only) and finetuned-ml
 # (a separate endpoint per language), one model handles every language, so the
 # language argument selects nothing here — it is accepted for a uniform
 # provider signature. eleven_multilingual_v2 is the model that handles
@@ -372,8 +372,8 @@ def synth_elevenlabs(text: str, language: str = "en") -> bytes:
 
 SYNTHESISERS = {
     "intron": synth_intron,
-    "prepai": synth_prepai,
-    "multilingua": synth_multilingua,
+    "finetuned-en": synth_finetuned_en,
+    "finetuned-ml": synth_multilingua,
     "elevenlabs": synth_elevenlabs,
 }
 
@@ -588,16 +588,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Benchmark TTS providers.")
     parser.add_argument(
         "--providers",
-        # multilingua only by default. prepai is the ENGLISH voice endpoint
-        # (prepai-tts.publicaai.com) with no Hausa, Igbo or Yoruba voices, so
+        # finetuned-ml only by default. finetuned-en is the ENGLISH voice endpoint
+        # (finetuned-en-tts.finetuned.com) with no Hausa, Igbo or Yoruba voices, so
         # scoring it on code-switched Nigerian text measures nothing about the
         # model — the same mistake as running an English ASR on Hausa audio.
         # It stays selectable for an English-only comparison.
         #
         # intron is opt-in too: it rate-limits hard and warms a language model
         # per session, so it belongs in its own run.
-        default="multilingua,elevenlabs",
-        help="comma separated: multilingua,elevenlabs,prepai,intron",
+        default="finetuned-ml,elevenlabs",
+        help="comma separated: finetuned-ml,elevenlabs,finetuned-en,intron",
     )
     parser.add_argument("--report", help="write full results to this JSON file")
     parser.add_argument(
