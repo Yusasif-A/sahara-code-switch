@@ -48,3 +48,7 @@ setup_livekit_number.py
 verify_number.py
 enable_calling.py
 grant_permission.py
+
+# The competition answers. Working notes for one submission form, not part of
+# the project, and nothing a reader of the code needs.
+SUBMISSION.md
