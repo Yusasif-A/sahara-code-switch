@@ -83,20 +83,35 @@ def pcm_from_wav(data: bytes) -> tuple[bytes, int]:
         return handle.readframes(handle.getnframes()), handle.getframerate()
 
 
-# Below this length, a trailing full stop is read out as the words "full stop".
-# Measured: "Done." came back as "Done. Full stop", while "Done" and "Done. The
-# card is frozen." were both clean. Sahara's text normaliser appears to treat a
-# final period with almost nothing in front of it as a token to pronounce rather
-# than as punctuation. The agent says short sentences constantly - "Done.",
-# "Okay." - so the caller heard it often.
+# Below this length, trailing punctuation is read out by name. Measured through
+# a synthesise-then-transcribe round trip:
+#
+#     "Done."   -> "Done. Full stop"
+#     "Done,"   -> "Done, comma"   on one run, "Done. Full stop" on the next
+#     "Done"    -> "Done"
+#     "Done. The card is frozen."  -> clean
+#
+# Two things follow. It is not specific to the full stop - a comma does it too,
+# which is why the caller heard both. And it is a coin flip rather than a fixed
+# rule, so it cannot be caught by testing a line once: the same text is clean on
+# one call and speaks its punctuation on the next.
+#
+# Sahara's normaliser appears to treat a final mark with almost nothing in front
+# of it as a token to pronounce rather than as punctuation. The agent says short
+# lines constantly - "Done.", "Okay," - so the caller heard it often.
 SHORT_TEXT_CHARS = 20
+
+# Marks with no prosody left to carry at the end of an utterance, so dropping
+# them costs nothing. "?" and "!" are deliberately absent: they shape the
+# intonation of the whole line, and neither was ever pronounced in testing.
+TRAILING_PUNCTUATION = ".,;: 	"
 
 
 def _spoken_text(raw: str) -> str:
-    """Trim the trailing full stop off a short line, which would be read aloud."""
+    """Trim trailing punctuation off a short line, which would be read aloud."""
     text = raw.strip()
-    if len(text) <= SHORT_TEXT_CHARS and text.endswith("."):
-        return text[:-1].rstrip()
+    if len(text) <= SHORT_TEXT_CHARS:
+        return text.rstrip(TRAILING_PUNCTUATION)
     return text
 
 

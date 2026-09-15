@@ -20,6 +20,22 @@ import code_switching
 # The one line the agent opens with. Said before anything else is asked.
 # --------------------------------------------------------------------------
 
+def spoken_digits(value) -> str:
+    """
+    Space out a run of digits so the voice reads them one by one.
+
+    Sahara's normaliser turns a bare number into a quantity: "your card ending
+    4081" is spoken "your card ending four thousand eighty-one", which is not a
+    card number and is not what the customer is looking at on their card.
+    Spacing the characters fixes it - "4 0 8 1" is read "four zero eight one".
+
+    Only identifiers go through this. Money and counts must keep their bare
+    form, because "85,000 Naira" really is eighty-five thousand and reading it
+    digit by digit would be worse.
+    """
+    return " ".join(str(value).strip())
+
+
 OPENING_LINE = (
     "Hello, am I speaking with {first_name}? "
     "This is {agent_name}, your A I assistant. "
@@ -283,7 +299,7 @@ def build_customer_profile(customer: dict, accounts=None, cards=None) -> str:
     for card in cards or []:
         lines.append(
             f"  Card {card['brand']} {card['cardType'].lower()} ending "
-            f"{card['last4']}, status {card['status'].lower()}"
+            f"{spoken_digits(card['last4'])}, status {card['status'].lower()}"
         )
 
     questions = customer.get("securityQuestions") or []
@@ -351,7 +367,8 @@ def build_risk_briefing(
     if card:
         lines.append(
             f"The card involved is a {card['brand']} {card['cardType'].lower()} card "
-            f"ending in {card['last4']}. Its current status is {card['status']}."
+            f"ending in {spoken_digits(card['last4'])}. "
+            f"Its current status is {card['status']}."
         )
     lines.append(build_customer_profile(customer, accounts, cards))
 

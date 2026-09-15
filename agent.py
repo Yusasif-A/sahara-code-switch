@@ -360,7 +360,7 @@ class FraudResponseAgent(Agent):
         logger.info("Card %s frozen: %s", card["cardId"], reason)
         return (
             "The card is now frozen. Tell the customer, in your own words: "
-            + prompts.CARD_FROZEN.format(last4=card["last4"])
+            + prompts.CARD_FROZEN.format(last4=prompts.spoken_digits(card["last4"]))
         )
 
     @function_tool()
@@ -386,7 +386,10 @@ class FraudResponseAgent(Agent):
             return f"That could not be done: {exc}. Call transfer_to_human_agent."
 
         self.actions_taken.append(f"lowered daily limit to {new_daily_limit}")
-        return f"The daily limit on the card ending {card['last4']} is now {new_daily_limit} Naira."
+        return (
+            f"The daily limit on the card ending "
+            f"{prompts.spoken_digits(card['last4'])} is now {new_daily_limit} Naira."
+        )
 
     @function_tool()
     async def flag_transaction(self, ctx: RunContext, reference_id: str, note: str) -> str:

@@ -1112,3 +1112,112 @@ def test_pidgin_never_leaves_the_english_voice(line):
 def test_a_real_switch_still_switches(line, voice):
     """Guarding against false switches must not block the true ones."""
     assert tts_router.VOICE_FOR[tts_router.detect_language(line)] == voice
+
+
+# ---------------------------------------------------------------------------
+# Sahara reads punctuation aloud on short lines
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "raw,spoken",
+    [
+        # Both marks were caught speaking themselves on a live call.
+        ("Done.", "Done"),
+        ("Done,", "Done"),
+        ("Okay,", "Okay"),
+        ("No wahala,", "No wahala"),
+        ("One moment.", "One moment"),
+        ("Okay, done.", "Okay, done"),
+        # Only the trailing mark goes; punctuation inside the line is prosody.
+        ("Yes, that is right.", "Yes, that is right"),
+        # Question and exclamation marks carry the intonation of the whole
+        # line and were never pronounced, so they stay.
+        ("Yes?", "Yes?"),
+        ("Which one?", "Which one?"),
+        # Long enough that the normaliser behaves, so nothing is touched.
+        ("I have frozen the card ending 4081 for you.",
+         "I have frozen the card ending 4081 for you."),
+        # A fragment that is nothing but punctuation must not be sent at all.
+        (".", ""),
+        (",", ""),
+        ("  ", ""),
+    ],
+)
+def test_short_lines_lose_trailing_punctuation(raw, spoken):
+    from intron_tts import _spoken_text
+
+    assert _spoken_text(raw) == spoken
+
+
+# ---------------------------------------------------------------------------
+# Short fragments are merged rather than spoken alone
+# ---------------------------------------------------------------------------
+
+
+def _routed(sentences, *, lang="en"):
+    """Run speak_routed over a fixed list, capturing what each voice was asked
+    to say. The engine is a stub: this is about text, not audio."""
+    import asyncio
+
+    spoken = []
+
+    class _Engine:
+        async def synthesize(self, text):
+            spoken.append(text)
+            return
+            yield  # pragma: no cover - makes this an async generator
+
+    class _Router:
+        def for_text(self, text):
+            return lang, _Engine()
+
+    async def _feed():
+        for s in sentences:
+            yield s
+
+    async def _drain():
+        async for _ in tts_router.speak_routed(_Router(), _feed()):
+            pass
+
+    asyncio.run(_drain())
+    return spoken
+
+
+def test_a_short_sentence_leads_the_next_one():
+    """Sahara speaks punctuation aloud on fragments sent by themselves."""
+    assert _routed(["Okay. ", "I have frozen the card ending 4081 for you. "]) == [
+        "Okay. I have frozen the card ending 4081 for you."
+    ]
+
+
+def test_several_short_sentences_collapse_into_one():
+    assert _routed(["Done. ", "Okay. ", "No wahala. "]) == ["Done. Okay. No wahala."]
+
+
+def test_a_lone_short_reply_is_still_spoken():
+    """Merging must never swallow a fragment that has nothing to merge into."""
+    assert _routed(["Done. "]) == ["Done."]
+
+
+def test_long_sentences_are_not_merged():
+    lines = [
+        "I have frozen the card ending 4081 for you now. ",
+        "Nothing else on the account has changed at all. ",
+    ]
+    assert _routed(lines) == [line.strip() for line in lines]
+
+
+def test_card_digits_are_spoken_one_by_one():
+    """A bare 4081 is read "four thousand eighty-one", which is not a card."""
+    from prompts import spoken_digits
+
+    assert spoken_digits("4081") == "4 0 8 1"
+    assert spoken_digits(9032) == "9 0 3 2"
+
+
+def test_the_frozen_card_line_spells_the_digits():
+    import prompts
+
+    line = prompts.CARD_FROZEN.format(last4=prompts.spoken_digits("4081"))
+    assert "4 0 8 1" in line and "4081" not in line

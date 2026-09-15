@@ -238,6 +238,23 @@ async def _collect(engine, text: str) -> list:
     return [event.frame async for event in engine.synthesize(text)]
 
 
+# A sentence shorter than this is held back and spoken together with the next
+# one instead of being sent to the voice on its own.
+#
+# Sahara's text normaliser pronounces punctuation on very short input, and it
+# does so intermittently - measured over five runs each, "Done." spoke "full
+# stop" twice, "Done," spoke "comma" once and "full stop" once, and even bare
+# "Done" with no punctuation at all spoke "full stop" once. Trimming the mark
+# therefore reduces it but cannot remove it: the trigger is the shortness, not
+# the character. "Done. The card is frozen." was clean every time.
+#
+# Merging costs nothing on latency and usually saves it. Sahara takes about five
+# seconds per call regardless of length, so two fragments spoken as one line is
+# one call instead of two, and the language model is far enough ahead of the
+# voice that the next sentence is almost always already waiting.
+MIN_SYNTHESIS_CHARS = 25
+
+
 async def speak_routed(router: LanguageRoutedTTS, sentences):
     """
     Synthesize an async stream of sentences, each with its own language's voice.
@@ -253,10 +270,16 @@ async def speak_routed(router: LanguageRoutedTTS, sentences):
     slower than playback and nothing else is in flight.
     """
     inflight: tuple[str, asyncio.Task] | None = None
+    held = ""
 
     async for sentence in sentences:
-        text = sentence.strip()
+        text = (held + " " + sentence.strip()).strip() if held else sentence.strip()
+        held = ""
         if not text:
+            continue
+        # Too short to send alone - keep it and lead the next sentence with it.
+        if len(text) < MIN_SYNTHESIS_CHARS:
+            held = text
             continue
         lang, engine = router.for_text(text)
         if lang != "en":
@@ -264,6 +287,16 @@ async def speak_routed(router: LanguageRoutedTTS, sentences):
 
         # Start this one before playing the last, so the two overlap.
         task = asyncio.create_task(_collect(engine, text))
+        if inflight is not None:
+            for frame in await inflight[1]:
+                yield frame
+        inflight = (lang, task)
+
+    # Nothing left to merge it into, so a short last fragment goes alone. The
+    # trailing-punctuation trim in the voice client is what covers this case.
+    if held:
+        lang, engine = router.for_text(held)
+        task = asyncio.create_task(_collect(engine, held))
         if inflight is not None:
             for frame in await inflight[1]:
                 yield frame
