@@ -95,7 +95,11 @@ class STTSettings:
     narrowband, code-switched audio this agent actually receives.
     """
 
-    provider: str = field(default_factory=lambda: _env("STT_PROVIDER", "deepgram").lower())
+    # Sahara by default, on both halves of the call. It is the only model that
+    # keeps both languages of a code-switched sentence, and the point of the
+    # project is that a caller does not have to pick one. STT_PROVIDER accepts
+    # elevenlabs, deepgram, finetuned or linguacenter to compare.
+    provider: str = field(default_factory=lambda: _env("STT_PROVIDER", "intron").lower())
     # STT_BASE_URL wins when set. ENGLISH_STT_API_URL is linguacenter, which is
     # English-only — fine for an English call, useless the moment the caller
     # switches. Point STT_BASE_URL at the finetuned-ml endpoint to test that.

@@ -126,7 +126,6 @@ the right thing, and the freeze is already in place either way.
 | `intron_tts.py` | Sahara text-to-speech over the generate endpoint |
 | `benchmark.py` | ASR benchmark: WER and CER per language, five models |
 | `tts_benchmark.py` | TTS benchmark: hallucination, transcript loss, segment loss |
-| `push_dataset.py` | Publishes the benchmarked clips to HuggingFace |
 | `test_guardrails.py` | 162 tests over the authority boundary, verification, the credential guard and language routing |
 
 The bank API mirrors the [Open Banking Nigeria](https://openbanking.readme.io/reference/overview)
@@ -183,12 +182,12 @@ Yoruba at all, and the default the fine-tuned English voice voice is English-onl
 
 ```dotenv
 STT_PROVIDER = finetuned
-STT_BASE_URL = https://stts-yoruba.finetuned.com/yo/v1
+STT_BASE_URL = https://<fine-tuned host>
 STT_LANGUAGE = auto
 ```
 
-`stts-yoruba` is a naming accident — that endpoint is the multilingual one, and
-it covers English, Yoruba, Hausa and Igbo. `STT_LANGUAGE=auto` omits the
+That endpoint is our fine-tuned multilingual one, covering English, Yoruba,
+Hausa and Igbo. `STT_LANGUAGE=auto` omits the
 language parameter entirely so the model decides; pinning it to `en` makes it
 decode a Yoruba utterance *as English*, which returns confident nonsense rather
 than an error.
@@ -264,47 +263,17 @@ ngrok http 8000                            # 3. public URL for Meta
 Put the ngrok URL + `/webhook/whatsapp` into the Meta Developer Console, subscribe
 to the **`calls`** field, and use `WHATSAPP_VERIFY_TOKEN` as the verify token.
 
-#### The order matters — webhook, then calling, then permission
+#### Account setup is a prerequisite, not part of this repo
 
-Meta refuses to enable calling until the webhook is already live and subscribed:
+Meta will not enable calling until the webhook is already live and subscribed,
+and a business cannot cold-call anyone until the customer taps to allow it.
+Both are one-off account chores done through the Meta console, and the scripts
+that automate them are kept out of the repo because they are not part of the
+agent.
 
-```
-(#138018) WhatsApp Business calling cannot be enabled because technical
-pre-requisites are not met
-```
-
-So do it in this order, and check your state at each step:
-
-```bash
-python enable_calling.py --check     # number, quality, verification, calling status
-python enable_calling.py --enable    # only works once the webhook is subscribed
-```
-
-`--check` also prints the messaging tier. Meta wants **2000/day or above** for
-calling to function — a new or unverified number starts lower, and calling can
-read as enabled while calls still fail.
-
-#### Then get call permission
-
-WhatsApp does not let a business cold-call anyone. The customer must tap to allow
-it. Message the business number **from the handset** to open a 24-hour service
-window, then:
-
-```bash
-python grant_permission.py --to +2348020812523
-```
-
-Tap **Allow** on the phone, and pick *Always* rather than the 7-day option — you
-only get 2 permission requests per user per week, so don't burn them.
-
-Meta's limits, worth knowing before you debug a silent failure:
-
-| Limit | Value |
-| --- | --- |
-| Permission requests | 1 per 24h, 2 per 7 days, per user |
-| Business-initiated calls | 1 per day, 2 per week, per user (production) |
-| Temporary permission | 7 calendar days |
-| Auto-revoke | after 4 consecutive unanswered calls |
+Two limits worth knowing before debugging a silent failure: the number needs a
+messaging tier of 2000/day or above for calling to work at all, and permission
+requests are capped at 1 per 24h and 2 per 7 days per user.
 
 #### Then fire the trigger
 

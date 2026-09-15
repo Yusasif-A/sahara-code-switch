@@ -38,3 +38,13 @@ yo_test.wav
 # is where the submission form asks for it.
 *.mp4
 *.wav
+
+# Operational scripts, kept locally but out of the repo. None of them is part
+# of the agent, the code-switching or the benchmark, which is all a reader
+# needs to follow: they are one-off account setup and dataset publishing.
+push_dataset.py
+setup_twilio.py
+setup_livekit_number.py
+verify_number.py
+enable_calling.py
+grant_permission.py

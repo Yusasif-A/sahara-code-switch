@@ -408,7 +408,7 @@ def transcribe_elevenlabs(audio: bytes, language: str = "en") -> str:
         return json.load(resp).get("text", "")
 
 
-# our fine-tuned model's multilingual STT. The host is named stts-yoruba for historical
+# Our own fine-tuned multilingual STT. The host and per-language paths come
 # reasons — it serves every language, selected by the path segment:
 #
 #     /en/v1   English        /ha/v1   Hausa
@@ -416,7 +416,7 @@ def transcribe_elevenlabs(audio: bytes, language: str = "en") -> str:
 #
 # Igbo deliberately has no segment, which is why IGBO_STT_API_URL in .env ends
 # at /v1 and is correct as written rather than missing something.
-FINETUNED_STT_HOST = "https://stts-yoruba.finetuned.com"
+FINETUNED_STT_HOST = "https://<fine-tuned host>.finetuned.com"
 
 # Nigerian Pidgin has no endpoint of its own; English is the closest model,
 # Pidgin being English-lexified, rather than an arbitrary pick.
@@ -430,7 +430,7 @@ FINETUNED_LANGUAGE_PATH = {
 
 
 def transcribe_finetuned(audio: bytes, language: str = "en") -> str:
-    """our fine-tuned multilingual modell STT, routed to the endpoint for the clip's language."""
+    """our fine-tuned multilingual STT, routed to the endpoint for the clip's language."""
     import os
 
     host = (os.getenv("FINETUNED_STT_HOST") or FINETUNED_STT_HOST).strip().strip(chr(34))
