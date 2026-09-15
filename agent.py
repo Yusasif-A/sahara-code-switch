@@ -521,6 +521,87 @@ class FraudResponseAgent(Agent):
 # ----------------------------------------------------------------------
 
 
+class BankEnquiryAgent(Agent):
+    """
+    The bank line for a caller we cannot identify.
+
+    One number answers both the telecom line and the bank, so anyone may ask
+    for the bank - including a number that has no account here. Hanging up on
+    them, or handing them to a queue, wastes a call that could still be useful:
+    most questions a bank gets are general, and the warning never to give a
+    P I N to a caller is worth more to a stranger than to a customer.
+
+    Deliberately toolless apart from ending the call and going back. With no
+    customer there is nothing to act on, and an agent holding tools it cannot
+    legitimately use is an agent looking for a reason to use them.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            instructions=prompts.build_bank_enquiry_prompt(
+                agent_name=settings.bank.agent_display_name,
+                bank_name=settings.bank.name,
+            ),
+            chat_ctx=ChatContext.empty(),
+        )
+        self._tts_router = (
+            tts_router.LanguageRoutedTTS() if settings.tts.routing else None
+        )
+        self.blocked_utterances: list[str] = []
+
+    async def tts_node(self, input, model_settings):
+        async def cleaned():
+            buffer = ""
+
+            def vet(raw: str) -> str:
+                sentence = sanitize_for_tts(raw)
+                term = mentions_forbidden_credential(sentence)
+                if term is None:
+                    return sentence
+                logger.error("GUARD BLOCKED: %s in %r", term, sentence)
+                self.blocked_utterances.append(sentence)
+                return prompts.CREDENTIAL_REQUEST_BLOCKED
+
+            async for chunk in input:
+                buffer += chunk
+                while (match := re.search(r"[.!?]\s", buffer)) is not None:
+                    sentence, buffer = buffer[: match.end()], buffer[match.end() :]
+                    if sentence.strip():
+                        yield vet(sentence)
+            if buffer.strip():
+                yield vet(buffer)
+
+        if self._tts_router is not None:
+            async for frame in tts_router.speak_routed(self._tts_router, cleaned()):
+                yield frame
+            return
+        async for frame in super().tts_node(cleaned(), model_settings):
+            yield frame
+
+    @function_tool()
+    async def switch_to_telecom(self, ctx: RunContext) -> str:
+        """
+        Hand the caller back to the telecom care line.
+
+        Call this if they say they actually wanted their phone line, or raise
+        anything about data, airtime, recharge, network or S I M.
+        """
+        from telco_agent import build_care_agent
+
+        logger.info("Bank enquiry -> telecom care line")
+        return build_care_agent()
+
+    @function_tool()
+    async def end_call(self, ctx: RunContext) -> str:
+        """End the call once the caller has no further questions."""
+        logger.info("Ending bank enquiry call")
+        if ctx.speech_handle is not None:
+            await ctx.speech_handle.wait_for_playout()
+        job = get_job_context()
+        await job.api.room.delete_room(api.DeleteRoomRequest(room=job.room.name))
+        return "Call ended."
+
+
 class NoBriefing(Exception):
     """An inbound caller with no live fraud alert waiting for them."""
 

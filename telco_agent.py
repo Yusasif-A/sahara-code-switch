@@ -53,8 +53,13 @@ logger = logging.getLogger("telco_agent.agent")
 class TelcoCareAgent(Agent):
     """Handles one inbound customer care call."""
 
-    def __init__(self, *, subscriber: dict, issue: dict | None) -> None:
+    def __init__(
+        self, *, subscriber: dict, issue: dict | None, caller_msisdn: str = ""
+    ) -> None:
         self.subscriber = subscriber
+        # The number they dialled from. The bank side needs it to tell a
+        # customer from a stranger, and caller ID is the only thing we have.
+        self.caller_msisdn = caller_msisdn
         self.issue = issue
         self.actions_taken: list[str] = []
         # One voice per language, built on first use. Without this a Yoruba
@@ -150,6 +155,38 @@ class TelcoCareAgent(Agent):
             "it. Explain what you can see, then either ask them to call back from "
             "the affected line, or call transfer_to_human_agent so a person can "
             "verify who they are."
+        )
+
+    @function_tool()
+    async def switch_to_bank(self, ctx: RunContext) -> str:
+        """
+        Hand the caller to the bank line.
+
+        Call this as soon as they say bank, or raise a card, a transaction, a
+        transfer, a debit from their account, or fraud. Do not ask why first.
+
+        If their number is on the bank's books they get the full security line,
+        which can verify them and freeze a card. If it is not, they get the
+        general bank line, which answers questions but cannot touch an account.
+        """
+        from agent import BankEnquiryAgent, FraudResponseAgent
+        from bank_api import NotFound, bank
+
+        try:
+            customer = bank.get_customer_by_phone(self.caller_msisdn)
+        except (NotFound, Exception):
+            logger.info("Telecom -> bank line (caller not a bank customer)")
+            return BankEnquiryAgent()
+
+        accounts = bank.get_accounts_by_customer(customer["customerId"])
+        cards = bank.get_cards_by_customer(customer["customerId"])
+        logger.info("Telecom -> bank line for %s", customer["customerId"])
+        return FraudResponseAgent(
+            signal=None,
+            customer=customer,
+            account=accounts[0],
+            card=cards[0] if len(cards) == 1 else None,
+            transport=self.transport if hasattr(self, "transport") else "whatsapp",
         )
 
     @function_tool()
@@ -472,7 +509,13 @@ async def entrypoint(ctx: JobContext) -> None:
     logger.info("STT         %s", settings.stt.provider)
     logger.info("=" * 70)
 
-    agent = TelcoCareAgent(subscriber=subscriber, issue=issue)
+    agent = TelcoCareAgent(
+        subscriber=subscriber,
+        issue=issue,
+        # Caller ID, so switch_to_bank can tell a bank customer from a
+        # stranger without asking them to identify themselves twice.
+        caller_msisdn=json.loads(ctx.job.metadata or "{}").get("msisdn", ""),
+    )
 
     session = AgentSession(
         vad=ctx.proc.userdata["vad"],
@@ -561,4 +604,14 @@ if __name__ == "__main__":
             # 8082, so this can run alongside the fraud agent on 8081.
             port=settings.telco.http_port,
         )
+    )
+
+
+def build_care_agent(msisdn: str = "") -> TelcoCareAgent:
+    """A care agent for a caller we know nothing about, used when the bank line hands back."""
+    issue = telco.get_issue(settings.telco.demo_issue_id)
+    return TelcoCareAgent(
+        subscriber=telco.get_subscriber(issue["subscriberId"]),
+        issue=issue,
+        caller_msisdn=msisdn,
     )
